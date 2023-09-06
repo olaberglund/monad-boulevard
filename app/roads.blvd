@@ -1,0 +1,17 @@
+main street:
+  direction: north
+  length: 100 
+  speed_limit: 20
+
+lagerbrings street:
+  direction: west
+  length: 50
+  speed_limit: -
+
+<!> Clockwise exits, starting from the north
+patrick's intersection:
+  1st exit: main
+  2nd exit: empty
+  3rd exit: empty
+  4th exit: lagerbrings
+
