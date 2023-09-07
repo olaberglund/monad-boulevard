@@ -3,6 +3,7 @@ module Main where
 import Text.Parsec (letter)
 import Text.Parsec.Char
 import Text.Parsec.Token
+import Data.Functor.Identity (Identity)
 
 main :: IO ()
 main = putStrLn "Hello, Haskell!"
@@ -22,18 +23,18 @@ data Street = Street
     speedLimit :: SpeedLimit
   }
 
-lexer :: LanguageDef String
-lexer =
+lexer :: GenTokenParser String u Identity
+lexer = makeTokenParser $ 
   LanguageDef
-    { commentStart = "",
-      commentEnd = "",
-      commentLine = "<!>",
+    { commentStart = "[!]",
+      commentEnd = "[!]",
+      commentLine = "--",
       nestedComments = False,
       reservedNames = ["street", "direction", "length", "speed-limit"],
-      reservedOpNames = [],
+      reservedOpNames = ["<>"],
       caseSensitive = False,
       identStart = letter,
-      identLetter = letter,
-      opStart = oneOf "<:",
-      opLetter = oneOf ">:"
+      identLetter = alphaNum,
+      opStart = oneOf "",
+      opLetter = oneOf ""
     }
