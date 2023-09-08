@@ -1,4 +1,9 @@
-main street:
-  direction: north
-  length: 100 
-  speed-limit: 20
+main street 
+  going north 
+  for 100
+  at limit 20
+
+olas street 
+  going west 
+  for 60
+  at limit 40

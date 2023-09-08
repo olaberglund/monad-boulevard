@@ -1,39 +1,69 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use <$>" #-}
 module Main where
 
-import Text.Parsec (letter)
-import Text.Parsec.Char
-import Text.Parsec.Token
+import Control.Applicative ((<|>))
+import Text.Parsec (choice)
+import Text.Parsec.Language (emptyDef)
+import Text.Parsec.String (Parser)
+import qualified Text.Parsec.Token as Tok
 
 main :: IO ()
 main = putStrLn "Hello, Haskell!"
 
-newtype Name = Name String
-
-newtype Length = Length Int
+newtype Natural = Natural Integer
+  deriving (Show)
 
 data Direction = North | South | East | West
-
-newtype SpeedLimit = SpeedLimit Int
+  deriving (Show)
 
 data Street = Street
-  { name :: Name,
-    length :: Length,
-    direction :: Direction,
-    speedLimit :: SpeedLimit
+  { name :: String,
+    dir :: Direction,
+    speedLimit :: Natural,
+    length :: Natural
   }
+  deriving (Show)
 
-lexer :: LanguageDef String
-lexer =
-  LanguageDef
-    { commentStart = "",
-      commentEnd = "",
-      commentLine = "<!>",
-      nestedComments = False,
-      reservedNames = ["street", "direction", "length", "speed-limit"],
-      reservedOpNames = [],
-      caseSensitive = False,
-      identStart = letter,
-      identLetter = letter,
-      opStart = oneOf "<:",
-      opLetter = oneOf ">:"
-    }
+lexer :: Tok.TokenParser ()
+lexer = Tok.makeTokenParser style
+  where
+    ops = []
+    names = ["street", "going", "for", "at", "limit", "north", "south", "east", "west"]
+    style =
+      emptyDef
+        { Tok.commentLine = "#",
+          Tok.reservedOpNames = ops,
+          Tok.reservedNames = names
+        }
+
+natural :: Parser Natural
+natural = Natural <$> Tok.natural lexer
+
+reserved :: String -> Parser ()
+reserved = Tok.reserved lexer
+
+identifier :: Parser String
+identifier = Tok.identifier lexer
+
+direction :: Parser Direction
+direction =
+  choice
+    [ North <$ reserved "north",
+      South <$ reserved "south",
+      East <$ reserved "east",
+      West <$ reserved "west"
+    ]
+
+street :: Parser Street
+street =
+  Street
+    <$> identifier
+    <* reserved "street"
+    <* reserved "going"
+    <*> direction
+    <* reserved "for"
+    <*> natural
+    <* reserved "at limit"
+    <*> natural
